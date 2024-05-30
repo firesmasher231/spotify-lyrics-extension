@@ -10,6 +10,16 @@ Entire thing was coded in about two hours so apologies for the mess of the code 
 
 (and yes this readme is chatgpt generated)
 
+Before:
+
+<img src="https://github.com/firesmasher231/spotify-lyrics/assets/66473811/f06a5e58-7143-412e-93c5-8f2917f88af2" alt="drawing" width="400"/>
+
+After:
+
+<img src="https://github.com/firesmasher231/spotify-lyrics/assets/66473811/8efddca2-abe0-4503-88eb-5a0c5ab06143" alt="drawing" width="400"/>
+
+
+
 ## Features
 
 - **🎶 Fetch Lyrics**: Automatically fetches lyrics for the currently playing song.
