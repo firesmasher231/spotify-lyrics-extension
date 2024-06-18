@@ -444,7 +444,18 @@ function handleUrlChange() {
 	if (url.includes("/lyrics")) {
 		console.log("Lyrics page detected");
 
-		runScript();
+		// runScript();
+		// wait till div with class vkO5F4KbLk8mbjZoy1Lf or _Wna90no0o0dta47Heiw is loaded, then run the main function
+		const interval = setInterval(() => {
+			const wrapper = document.getElementsByClassName(
+				"zPI8TW58LMxEQDIq_GdA"
+			).length;
+			console.log("Checking for wrapper: ", wrapper, "elements");
+			if (wrapper > 0) {
+				clearInterval(interval);
+				main();
+			}
+		}, 200);
 	}
 }
 
