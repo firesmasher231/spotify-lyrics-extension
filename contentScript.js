@@ -6,8 +6,17 @@ title = "";
 lyricsElement = null;
 
 // Function to fetch lyrics from the Lyrics.ovh API
+let lastTitle = "";
+
 function fetchLyrics(artist, title, callback) {
 	var request = new XMLHttpRequest();
+	// console.log("request", request);
+	// console.log("lastRequest", lastRequest);
+	if (lastTitle == title) {
+		console.log("Same request, returning");
+		return;
+	}
+	lastTitle = title;
 
 	// request.open(
 	// 	"GET",
@@ -44,6 +53,9 @@ function fetchLyrics(artist, title, callback) {
 }
 
 let isHandlingChanges = false;
+
+let previousTitle = "";
+let previousArtist = "";
 
 // Function to handle changes in the target node
 function handleChanges(mutationsList, observer) {
@@ -260,7 +272,12 @@ function handleChanges(mutationsList, observer) {
 	}, 100); // 2000 milliseconds = 2 seconds
 }
 
+// let processing = false;
+
 function main() {
+	// if (processing) return;
+	// processing = true
+
 	// Configuration object for the observer
 	const config = { childList: true, subtree: true };
 
@@ -406,6 +423,17 @@ function main() {
 					);
 					div.setAttribute("data-testid", "fullscreen-lyric");
 
+					line = line.trim();
+					// console.log("line", line.substring(0, 1), line.substring(-1, -1));
+
+					if (
+						(line.substring(0, 1) == "[" && line.substring(-1, -1) == "]") ||
+						(line.substring(0, 1) == "(" && line.substring(-1, -1) == ")")
+					) {
+						console.log("line", line);
+						div.style.color = rgb(117, 117, 134);
+					}
+
 					const innerDiv = document.createElement("div");
 					innerDiv.setAttribute("class", "BXlQFspJp_jq9SKhUSP3");
 					innerDiv.innerText = line;
@@ -416,6 +444,7 @@ function main() {
 			}
 		});
 	}
+	processing = false;
 }
 
 // Function to convert prices on the page
@@ -447,9 +476,9 @@ function handleUrlChange() {
 		// runScript();
 		// wait till div with class vkO5F4KbLk8mbjZoy1Lf or _Wna90no0o0dta47Heiw is loaded, then run the main function
 		const interval = setInterval(() => {
-			const wrapper = document.getElementsByClassName(
-				"zPI8TW58LMxEQDIq_GdA"
-			).length;
+			const wrapper =
+				document.getElementsByClassName("zPI8TW58LMxEQDIq_GdA").length +
+				document.getElementsByClassName("e7eFLioNSG5PAi1qVFT4").length;
 			console.log("Checking for wrapper: ", wrapper, "elements");
 			if (wrapper > 0) {
 				clearInterval(interval);
