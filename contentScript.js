@@ -162,27 +162,29 @@ function syncLyrics(mutationsList, observer) {
 
 // call syncLyrics every time the song time changes so oberve the song time element which is the div with class IPbBrI6yF4zhaizFmrg6
 
-let previousTime = "";
+function startSyncingLyrics() {
+	let previousTime = "";
 
-let songTimeDiv = document.getElementsByClassName("gglUjikTBtMzCZFgSmpS")[0];
-let songTimeElement = document.getElementsByClassName(
-	"IPbBrI6yF4zhaizFmrg6"
-)[0];
+	let songTimeDiv = document.getElementsByClassName("gglUjikTBtMzCZFgSmpS")[0];
+	let songTimeElement = document.getElementsByClassName(
+		"IPbBrI6yF4zhaizFmrg6"
+	)[0];
 
-console.log("songTimeElement", songTimeElement);
+	console.log("songTimeElement", songTimeElement);
 
-new MutationObserver(() => {
-	const currentTime = songTimeElement.innerText;
-	// console.log("mutation occured: ", currentTime);
-	if (currentTime !== previousTime) {
-		previousTime = currentTime;
-		syncLyrics();
-	}
-}).observe(songTimeDiv, {
-	subtree: true,
-	childList: true,
-	characterData: true,
-});
+	new MutationObserver(() => {
+		const currentTime = songTimeElement.innerText;
+		// console.log("mutation occured: ", currentTime);
+		if (currentTime !== previousTime) {
+			previousTime = currentTime;
+			syncLyrics();
+		}
+	}).observe(songTimeDiv, {
+		subtree: true,
+		childList: true,
+		characterData: true,
+	});
+}
 
 // Function to handle changes in the target node
 function handleChanges(mutationsList, observer) {
@@ -418,11 +420,14 @@ function handleChanges(mutationsList, observer) {
 
 function main() {
 	handleChanges([{ type: "childList" }], null);
+
+	startSyncingLyrics();
 }
 
 function runScript() {
-	console.log("ran");
-	main();
+	setTimeout(() => {
+		main();
+	}, 500);
 }
 
 // Function to detect URL changes
