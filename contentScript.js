@@ -10,21 +10,12 @@ let lastTitle = "";
 
 function fetchLyrics(artist, title, callback) {
 	var request = new XMLHttpRequest();
-	// console.log("request", request);
-	// console.log("lastRequest", lastRequest);
+
 	if (lastTitle == title) {
 		console.log("Same request, returning");
 		return;
 	}
 	lastTitle = title;
-
-	// find song duration div
-	songDuration = document
-		.getElementsByClassName("kQqIrFPM5PjMWb5qUS56")[0]
-		.innerText.split(":");
-	console.log("songDuration", songDuration);
-
-	seconds = parseFloat(songDuration[0]) * 60 + parseFloat(songDuration[1]);
 
 	url = `https://lrclib.net/api/search?artist_name=${encodeURI(
 		artist
@@ -34,11 +25,11 @@ function fetchLyrics(artist, title, callback) {
 	request.open("GET", url);
 
 	request.onreadystatechange = function () {
-		if (this.readyState === 4) {
-			console.log("Status:", this.status);
-			console.log("Headers:", this.getAllResponseHeaders());
-			console.log("Body:", this.responseText);
-		}
+		// if (this.readyState === 4) {
+		// 	console.log("Status:", this.status);
+		// 	console.log("Headers:", this.getAllResponseHeaders());
+		// 	console.log("Body:", this.responseText);
+		// }
 	};
 
 	request.send();
@@ -68,6 +59,7 @@ let previousTitle = "";
 let previousArtist = "";
 
 let activeLyric = null;
+let activeLyric2 = null;
 
 // Function to sync the lyrics with the song
 function syncLyrics(mutationsList, observer) {
@@ -83,11 +75,17 @@ function syncLyrics(mutationsList, observer) {
 	const seconds = parseFloat(currentTime[0]) * 60 + parseFloat(currentTime[1]);
 
 	// Find the active lyric
+
 	let newActiveLyric = null;
+
+	// console.log("isModLyricsEle", isModLyricsEle[0].style.display);
+	// console.log("lyricsElement", lyricsElement[0].style.display);
+
 	for (let child of lyricsElement[0].children) {
 		if (child.getAttribute("data-time") <= seconds) {
 			newActiveLyric = child;
 		} else {
+			// console.log("breaking:" + child.innerText);
 			break;
 		}
 	}
@@ -109,6 +107,8 @@ function syncLyrics(mutationsList, observer) {
 
 // call syncLyrics every time the song time changes so oberve the song time element which is the div with class IPbBrI6yF4zhaizFmrg6
 
+let songObserver = null;
+
 function startSyncingLyrics() {
 	let previousTime = "";
 
@@ -117,15 +117,15 @@ function startSyncingLyrics() {
 		"IPbBrI6yF4zhaizFmrg6"
 	)[0];
 
-	console.log("songTimeElement", songTimeElement);
+	// console.log("songTimeElement", songTimeElement);
 
-	new MutationObserver(() => {
-		const currentTime = songTimeElement.innerText;
-		console.log("mutation occured: ", currentTime);
-		if (currentTime !== previousTime) {
-			previousTime = currentTime;
-			syncLyrics();
-		}
+	songObserver = new MutationObserver(() => {
+		// const currentTime = songTimeElement.innerText;
+		// console.log("mutation occured: ", currentTime);
+		// if (currentTime !== previousTime) {
+		// 	previousTime = currentTime;
+		syncLyrics();
+		// }
 	}).observe(songTimeDiv, {
 		subtree: true,
 		childList: true,
@@ -133,11 +133,21 @@ function startSyncingLyrics() {
 	});
 }
 
+// stop observing the song time element
+function stopSyncingLyrics() {
+	if (songObserver) songObserver.disconnect();
+}
+
+let handleChangesLastTitle = "";
+
 // Function to handle changes in the target node
 function handleChanges(mutationsList, observer) {
 	if (isHandlingChanges) return;
 
 	isHandlingChanges = true;
+
+	stopSyncingLyrics();
+	startSyncingLyrics();
 
 	for (let mutation of mutationsList) {
 		if (mutation.type === "childList" || mutation.type === "subtree") {
@@ -282,6 +292,8 @@ function handleChanges(mutationsList, observer) {
 						artist = initialTitles[1].innerText;
 						console.log("Detected change, new text:", name);
 						title = name;
+
+						// if (title == previousTitle) return;
 
 						if (artist != "") {
 							artist = artist.split(",")[0];
