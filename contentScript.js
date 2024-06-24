@@ -7,112 +7,59 @@ lyricsElement = null;
 
 // Function to fetch lyrics from the Lyrics.ovh API
 let lastTitle = "";
-let lastAlbum = "";
-
-async function findAlbum(title, artist) {
-	try {
-		if (lastAlbum == title) {
-			console.log("Same request, returning");
-			return;
-		}
-		lastAlbum = title;
-		// Search for recordings that match the title and artist
-		const searchUrl = `https://musicbrainz.org/ws/2/recording/?query=recording:${encodeURIComponent(
-			title
-		)}%20AND%20artist:${encodeURIComponent(artist)}&fmt=json`;
-		const searchResponse = await fetch(searchUrl);
-		const searchData = await searchResponse.json();
-
-		// Find the recording with the closest duration match
-		const recordings = searchData.recordings;
-
-		const recording = recordings.find(
-			(rec) =>
-				// Math.abs(rec.length - duration) < 1000 &&
-				!rec["releases"][0]["release-group"]["title"].includes("Apple") &&
-				!rec["releases"][0]["release-group"]["title"].includes("Promo")
-		);
-
-		console.log(recording);
-		if (recording) {
-			// Fetch release groups (albums) for the found recording
-
-			const releaseGroupUrl = `https://musicbrainz.org/ws/2/release-group/${recording["releases"][0]["release-group"]["id"]}?fmt=json`;
-			console.log(releaseGroupUrl);
-			const releaseGroupResponse = await fetch(releaseGroupUrl);
-			const releaseGroupData = await releaseGroupResponse.json();
-
-			return releaseGroupData["title"];
-		} else {
-			return "No matching recording found";
-		}
-	} catch (error) {
-		console.error("Error finding album:", error);
-	}
-}
 
 function fetchLyrics(artist, title, callback) {
-	findAlbum(title, artist)
-		.then((album) => {
-			console.log("Album found:", album);
+	var request = new XMLHttpRequest();
+	// console.log("request", request);
+	// console.log("lastRequest", lastRequest);
+	if (lastTitle == title) {
+		console.log("Same request, returning");
+		return;
+	}
+	lastTitle = title;
 
-			var request = new XMLHttpRequest();
-			// console.log("request", request);
-			// console.log("lastRequest", lastRequest);
-			if (lastTitle == title) {
-				console.log("Same request, returning");
-				return;
+	// find song duration div
+	songDuration = document
+		.getElementsByClassName("kQqIrFPM5PjMWb5qUS56")[0]
+		.innerText.split(":");
+	console.log("songDuration", songDuration);
+
+	seconds = parseFloat(songDuration[0]) * 60 + parseFloat(songDuration[1]);
+
+	url = `https://lrclib.net/api/search?artist_name=${encodeURI(
+		artist
+	)}&track_name=${encodeURI(title)}`;
+
+	console.log("request url", url);
+	request.open("GET", url);
+
+	request.onreadystatechange = function () {
+		if (this.readyState === 4) {
+			console.log("Status:", this.status);
+			console.log("Headers:", this.getAllResponseHeaders());
+			console.log("Body:", this.responseText);
+		}
+	};
+
+	request.send();
+
+	request.onload = function () {
+		console.log("request.status", request.status);
+		if (request.status >= 200 && request.status < 400) {
+			// Success status codes
+			const data = JSON.parse(request.responseText)[0];
+			console.log("Data:", data);
+			if (data["syncedLyrics"]) {
+				console.log("Lyrics found: calling back with lyrics");
+				callback(null, data.syncedLyrics);
+			} else {
+				callback("Lyrics not found", null);
 			}
-			lastTitle = title;
-
-			// find song duration div
-			songDuration = document
-				.getElementsByClassName("kQqIrFPM5PjMWb5qUS56")[0]
-				.innerText.split(":");
-			console.log("songDuration", songDuration);
-
-			seconds = parseFloat(songDuration[0]) * 60 + parseFloat(songDuration[1]);
-
-			url = `https://lrclib.net/api/get?artist_name=${encodeURI(
-				artist
-			)}&track_name=${encodeURI(title)}&album_name=${encodeURI(
-				album
-			)}&duration=${encodeURI(seconds)}`;
-
-			console.log("request url", url);
-			request.open("GET", url);
-
-			request.onreadystatechange = function () {
-				if (this.readyState === 4) {
-					console.log("Status:", this.status);
-					console.log("Headers:", this.getAllResponseHeaders());
-					console.log("Body:", this.responseText);
-				}
-			};
-
-			request.send();
-
-			request.onload = function () {
-				console.log("request.status", request.status);
-				if (request.status >= 200 && request.status < 400) {
-					// Success status codes
-					const data = JSON.parse(request.responseText);
-					console.log("Data:", data);
-					if (data["syncedLyrics"]) {
-						console.log("Lyrics found: calling back with lyrics");
-						callback(null, data.syncedLyrics);
-					} else {
-						callback("Lyrics not found", null);
-					}
-				} else {
-					// Error status codes
-					callback("Error fetching lyrics", null);
-				}
-			};
-		})
-		.catch((error) => {
-			console.error("Error:", error);
-		});
+		} else {
+			// Error status codes
+			callback("Error fetching lyrics", null);
+		}
+	};
 }
 
 let isHandlingChanges = false;
@@ -174,7 +121,7 @@ function startSyncingLyrics() {
 
 	new MutationObserver(() => {
 		const currentTime = songTimeElement.innerText;
-		// console.log("mutation occured: ", currentTime);
+		console.log("mutation occured: ", currentTime);
 		if (currentTime !== previousTime) {
 			previousTime = currentTime;
 			syncLyrics();
