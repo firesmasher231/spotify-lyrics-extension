@@ -58,6 +58,23 @@ async function displayNoneFix() {
 	lyricsElement = document.getElementsByClassName("_Wna90no0o0dta47Heiw");
 
 	setTimeout(() => {
+		try {
+			let percentageNone = 0;
+			for (let c of lyricsElement[0].children) {
+				if (c.style.display == "none") {
+					percentageNone++;
+				}
+			}
+			percentageNone =
+				(percentageNone / lyricsElement[0].children.length) * 100;
+			if (percentageNone < 40) {
+				console.log("Display none percentage:", percentageNone);
+				console.log("Returning as display none percentage is greater than 10%");
+				return;
+			}
+		} catch (e) {
+			console.log("Error", e);
+		}
 		if (lyricsElement.length > 0) {
 			lyricsElement[0].style.setProperty("display", "block", "important");
 		}
