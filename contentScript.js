@@ -53,6 +53,24 @@ function fetchLyrics(artist, title, callback) {
 	};
 }
 
+async function displayNoneFix() {
+	console.log("displayNoneFix called");
+	lyricsElement = document.getElementsByClassName("_Wna90no0o0dta47Heiw");
+
+	setTimeout(() => {
+		if (lyricsElement.length > 0) {
+			lyricsElement[0].style.setProperty("display", "block", "important");
+		}
+		try {
+			for (let c of lyricsElement[0].children) {
+				c.style.display = "block";
+			}
+		} catch (e) {
+			console.log("Error while doing lyrics display fix: ", e);
+		}
+	}, 200);
+}
+
 let isHandlingChanges = false;
 
 let previousTitle = "";
@@ -142,12 +160,23 @@ let handleChangesLastTitle = "";
 
 // Function to handle changes in the target node
 function handleChanges(mutationsList, observer) {
+	displayNoneFix();
 	if (isHandlingChanges) return;
 
 	isHandlingChanges = true;
 
 	stopSyncingLyrics();
 	startSyncingLyrics();
+
+	const temptitles = document.getElementsByClassName("PGSe59fD1Hwc9yUM2d3U");
+
+	if (temptitles.length > 0) {
+		name = temptitles[0].innerText;
+
+		if (name == handleChangesLastTitle) {
+			return;
+		}
+	}
 
 	for (let mutation of mutationsList) {
 		if (mutation.type === "childList" || mutation.type === "subtree") {
