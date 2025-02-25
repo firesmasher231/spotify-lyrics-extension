@@ -1,17 +1,22 @@
 {
 	"manifest_version": 2,
 	"name": "Spotify Lyrics returner",
-	"version": "1.0",
+	"version": "1.2",
 	"description": "Adds back lyrics to your spotify for free :P - by aj ",
-	"permissions": ["https://open.spotify.com/*"],
+	"permissions": [
+		"https://open.spotify.com/*"
+	],
 	"content_scripts": [
 		{
-			"matches": ["https://open.spotify.com/*"],
-			"js": ["contentScript.js"],
+			"matches": [
+				"https://open.spotify.com/*"
+			],
+			"js": [
+				"contentScript.js"
+			],
 			"run_at": "document_idle"
 		}
 	],
-
 	"icons": {
 		"16": "icon16.png",
 		"48": "icon48.png",
