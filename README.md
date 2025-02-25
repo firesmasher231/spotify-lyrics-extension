@@ -31,11 +31,12 @@ After:
 
 - Any Chromium based browser
 
-### Steps
+### Steps to install stable build
 
-1. **Download the Extension**:
+1. **Download the rar file**:
 
-   - Get the latest `.crx` file from the [Releases](https://github.com/your-username/spotify-lyrics-returner/releases) section.
+   - Get the latest `.rar` file from the [Releases](https://github.com/your-username/spotify-lyrics-returner/releases) section.
+   - Extract the `.rar` file to a folder
 
 2. **Enable Developer Mode in your browser**:
 
@@ -43,7 +44,7 @@ After:
 
 3. **Install the Extension**:
 
-   - Drag and drop the downloaded `.crx` file onto the Extensions page.
+   - Press "load unpacked" and navigate to the extracted folder
    - Confirm the installation by clicking "Add extension".
 
 4. **Enjoy Your Lyrics**:
